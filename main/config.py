@@ -1,6 +1,6 @@
 # NovaLyrics Configuration File
 # Song: Santhana Susum
-# Author: Shanudha Tirosh
+# Author: Unknown
 
 SONG_TITLE = "Santhana Susum"
 ARTIST = "Unkown"
