@@ -5,6 +5,11 @@ import threading
 import os
 from config import LYRICS_DATA, COLORS, RESET, BOLD, UNDERLINE, SONG_TITLE, ARTIST, AUDIO_FILE
 
+# Set UTF-8 encoding for terminal output to support emojis
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
