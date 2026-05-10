@@ -28,18 +28,18 @@ def type_lyrics():
         printed_dots = False
         last_dot_time = time.time()
         
-        # Wait for the lyric line to start
+        # Wait for the lyric line to start (with a single-line progress indicator)
         while time.time() - audio_start < start_time:
             time.sleep(0.01)
             if time.time() - last_dot_time >= 1:
-                sys.stdout.write(f"{COLORS[2]}.{RESET}")
+                dots = "." * int(time.time() - last_dot_time) # Simple animation
+                sys.stdout.write(f"\r{COLORS[2]}Waiting {dots}{RESET}")
                 sys.stdout.flush()
-                last_dot_time = time.time()
-                printed_dots = True
         
-        if printed_dots:
-            sys.stdout.write('\n')
-            sys.stdout.flush()
+        # Clear the waiting line before printing the lyric
+        sys.stdout.write("\r" + " " * 60 + "\r")
+        sys.stdout.flush()
+
         
         # Get color for this line
         color = COLORS[color_index % len(COLORS)]
