@@ -10,29 +10,55 @@ if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
 
+def get_terminal_width():
+    try:
+        return os.get_terminal_size().columns
+    except:
+        return 80  # Default fallback width
+
 def clear_screen():
+
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_banner():
+    terminal_width = get_terminal_width()
+
+    line1 = f"🎵  NOW PLAYING: {SONG_TITLE}  🎵"
+    line2 = f"👤  ARTIST: {ARTIST}"
+    border = "=" * 52
+    
+    padding1 = (terminal_width - len(line1)) // 2
+    padding2 = (terminal_width - len(line2)) // 2
+    paddingB = (terminal_width - len(border)) // 2
+    
     banner = f"""
-{COLORS[5]}{BOLD}====================================================
-           🎵  NOW PLAYING: {SONG_TITLE}  🎵
-           👤  ARTIST: {ARTIST}
-===================================================={RESET}
+{" " * paddingB}{COLORS[5]}{BOLD}{border}{RESET}
+{" " * padding1}{BOLD}{line1}{RESET}
+{" " * padding2}{BOLD}{line2}{RESET}
+{" " * paddingB}{COLORS[5]}{BOLD}{border}{RESET}
     """
     print(banner)
+
 
 def type_lyrics():
     audio_start = time.time()
     color_index = 0
     
     for start_time, line, duration in LYRICS_DATA:
+        # Calculate centering padding
+        terminal_width = get_terminal_width()
+
+        padding = (terminal_width - len(line) - 2) // 2
+        padding_str = " " * max(0, padding)
+        
         printed_dots = False
         last_dot_time = time.time()
         
         while time.time() - audio_start < start_time:
             time.sleep(0.01)
             if time.time() - last_dot_time >= 1:
+                if not printed_dots:
+                    sys.stdout.write(padding_str)
                 sys.stdout.write(f"{COLORS[2]}.{RESET}")
                 sys.stdout.flush()
                 last_dot_time = time.time()
@@ -42,20 +68,25 @@ def type_lyrics():
             sys.stdout.write('\n')
             sys.stdout.flush()
         
-        letter_delay = duration / len(line) if len(line) > 0 else 0.1
-        
         # Get color for this line
         color = COLORS[color_index % len(COLORS)]
         color_index += 1
         
-        # Print line with styling
-        sys.stdout.write(f"{BOLD}{color}» {RESET}{color}")
-        for char in line:
+        # Handle Sinhala grapheme clusters correctly (prevents messy characters)
+        import re
+        graphemes = re.findall(r'.[\u0D80-\u0DFF]*', line)
+        
+        # Print line with styling (centered)
+        sys.stdout.write(padding_str + f"{color}» ")
+
+
+        for char in graphemes:
             sys.stdout.write(char)
             sys.stdout.flush()
-            time.sleep(letter_delay)
+            time.sleep(duration / len(graphemes) if len(graphemes) > 0 else 0.1)
         sys.stdout.write(RESET + "\n")
         sys.stdout.flush()
+
 
 def main():
     try:

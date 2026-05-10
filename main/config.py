@@ -3,7 +3,7 @@
 # Author: Shanudha Tirosh
 
 SONG_TITLE = "Santhana Susum"
-ARTIST = "Shanudha Tirosh"
+ARTIST = "Unknown"
 AUDIO_FILE = "santhana_susum.mp3"
 
 # Lyrics with start times (seconds), line text, and display duration
