@@ -48,14 +48,17 @@ def type_lyrics():
         # Handle Sinhala grapheme clusters correctly
         graphemes = re.findall(r'.[\u0D80-\u0DFF]*', line)
         
-        # Print line (Left Aligned for maximum compatibility)
-        sys.stdout.write(f"{color}» ")
-        for char in graphemes:
-            sys.stdout.write(char)
+        # Typewriter effect with full prefix redrawing (fixes messy joining)
+        delay = duration / len(graphemes) if len(graphemes) > 0 else 0.1
+        for i in range(1, len(graphemes) + 1):
+            current_text = "".join(graphemes[:i])
+            sys.stdout.write(f"\r{color}» {current_text}")
             sys.stdout.flush()
-            time.sleep(duration / len(graphemes) if len(graphemes) > 0 else 0.1)
+            time.sleep(delay)
+        
         sys.stdout.write(RESET + "\n")
         sys.stdout.flush()
+
 
 def main():
     try:
