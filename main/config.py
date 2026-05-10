@@ -1,9 +1,10 @@
 # NovaLyrics Configuration File
 # Song: Santhana Susum
-# Author: Unknown
+# Author: Shanudha Tirosh
 
 SONG_TITLE = "Santhana Susum"
-ARTIST = "Unkown"
+ARTIST = "Shanudha Tirosh"
+
 AUDIO_FILE = "santhana_susum.mp3"
 
 # Lyrics with start times (seconds), line text, and display duration

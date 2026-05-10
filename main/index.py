@@ -45,19 +45,14 @@ def type_lyrics():
         color = COLORS[color_index % len(COLORS)]
         color_index += 1
         
-        # Handle Sinhala grapheme clusters correctly
-        graphemes = re.findall(r'.[\u0D80-\u0DFF]*', line)
+        # Normalize text to NFC and print the whole line at once to fix font joining
+        import unicodedata
+        normalized_line = unicodedata.normalize('NFC', line)
         
-        # Typewriter effect with full prefix redrawing (fixes messy joining)
-        delay = duration / len(graphemes) if len(graphemes) > 0 else 0.1
-        for i in range(1, len(graphemes) + 1):
-            current_text = "".join(graphemes[:i])
-            sys.stdout.write(f"\r{color}» {current_text}")
-            sys.stdout.flush()
-            time.sleep(delay)
-        
-        sys.stdout.write(RESET + "\n")
+        sys.stdout.write(f"{color}» {normalized_line}{RESET}\n")
+
         sys.stdout.flush()
+
 
 
 def main():
