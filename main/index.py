@@ -1,0 +1,92 @@
+import pygame
+import time
+import sys
+import threading
+import os
+from config import LYRICS_DATA, COLORS, RESET, BOLD, UNDERLINE, SONG_TITLE, ARTIST, AUDIO_FILE
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def print_banner():
+    banner = f"""
+{COLORS[5]}{BOLD}====================================================
+           🎵  NOW PLAYING: {SONG_TITLE}  🎵
+           👤  ARTIST: {ARTIST}
+===================================================={RESET}
+    """
+    print(banner)
+
+def type_lyrics():
+    audio_start = time.time()
+    color_index = 0
+    
+    for start_time, line, duration in LYRICS_DATA:
+        printed_dots = False
+        last_dot_time = time.time()
+        
+        while time.time() - audio_start < start_time:
+            time.sleep(0.01)
+            if time.time() - last_dot_time >= 1:
+                sys.stdout.write(f"{COLORS[2]}.{RESET}")
+                sys.stdout.flush()
+                last_dot_time = time.time()
+                printed_dots = True
+        
+        if printed_dots:
+            sys.stdout.write('\n')
+            sys.stdout.flush()
+        
+        letter_delay = duration / len(line) if len(line) > 0 else 0.1
+        
+        # Get color for this line
+        color = COLORS[color_index % len(COLORS)]
+        color_index += 1
+        
+        # Print line with styling
+        sys.stdout.write(f"{BOLD}{color}» {RESET}{color}")
+        for char in line:
+            sys.stdout.write(char)
+            sys.stdout.flush()
+            time.sleep(letter_delay)
+        sys.stdout.write(RESET + "\n")
+        sys.stdout.flush()
+
+def main():
+    try:
+        # Check if audio file exists
+        audio_path = os.path.join(os.path.dirname(__file__), AUDIO_FILE)
+        if not os.path.exists(audio_path):
+            print(f"{COLORS[0]}Error: Audio file '{AUDIO_FILE}' not found in the 'main' directory.{RESET}")
+            return
+
+        clear_screen()
+        print_banner()
+        
+        print(f"{COLORS[3]}Loading audio engine...{RESET}")
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_path)
+        
+        print(f"{COLORS[2]}Starting playback...{RESET}\n")
+        pygame.mixer.music.play()
+
+        lyrics_thread = threading.Thread(target=type_lyrics)
+        lyrics_thread.daemon = True  # Ensure thread closes on exit
+        lyrics_thread.start()
+
+        while pygame.mixer.music.get_busy():
+            time.sleep(1)
+
+        lyrics_thread.join(timeout=1)
+        print(f"\n{BOLD}{COLORS[5]}✨ Song finished! - by Shanudha Tirosh ✨{RESET}")
+
+    except KeyboardInterrupt:
+        print(f"\n\n{COLORS[1]}Playback stopped by user.{RESET}")
+        pygame.mixer.music.stop()
+    except Exception as e:
+        print(f"\n{COLORS[0]}An unexpected error occurred: {e}{RESET}")
+    finally:
+        pygame.quit()
+
+if __name__ == "__main__":
+    main()
